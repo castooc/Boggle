@@ -48,7 +48,13 @@ des={"de1":["E", "T", "U", "K", "N", "O"],
 
 #Fonction qui va prendre en valeur les noms des 2 joueurs et la grandeur de la grille
 def inputjeu():
-    name = {"name1":input("Veuillez entrez le nom du joueur 1: "),"name2":input("Veuillez entrez le nom du joueur 2: ")}
+    name1=input("Veuillez entrez le nom du joueur 1: ")
+    while name1 =="":
+        name1=input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 1: ")
+    name2=input("Veuillez entrez le nom du joueur 2: ")
+    while name2 =="":
+        name2=input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 2: ")
+    name = {"name1":name1,"name2":name2}
 
     while True:
         grille=input("Veuillez choisir une taille de grille entre 4x4, 5x5 ou 6x6: ")
@@ -71,7 +77,10 @@ def generer_grille(taille):
         print('6x6')
         return
     
-generateur = generer_grille(inputjeu())
+print(inputjeu())
+
+# generateur = generer_grille(inputjeu())
+
 
 
 def jouer():
