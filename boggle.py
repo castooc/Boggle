@@ -57,48 +57,58 @@ def inputjeu():
         name2=input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 2: ")
     name = {"name1":name1,"name2":name2}
     while True:
-        grille=input("Veuillez choisir une taille de grille entre 4x4, 5x5 ou 6x6: ")
-        if grille == "4x4" or grille == "5x5" or grille == "6x6" :
+        grille=input("Veuillez choisir une taille de grille (j x j) entre '4', '5' ou '6': ")
+        if grille == "4" or grille == "5" or grille == "6" :
             break
     userinput = [name,grille]
     return userinput
 
 #Fonction qui va créer une liste de dés de manière aléatoire pour la création de la grille 
 def randomize_des(userinput):
-    if (userinput[1]== '4x4'):
-        number = 16
-    elif (userinput[1] == '5x5'):
-        number = 25
-    elif (userinput[1] == '6x6'):
-        number = 36
+    if (userinput[1]== '4'):
+        number_of_dices = 16
+    elif (userinput[1] == '5'):
+        number_of_dices = 25
+    elif (userinput[1] == '6'):
+        number_of_dices = 36
     des_liste = []
-    while len(des_liste)<number:  
-        random_number_liste = random.randint(1,number)
+    while len(des_liste)<number_of_dices:  
+        random_number_liste = random.randint(1,number_of_dices)
         random_number_face = random.randint(0,5) 
         if (random_number_liste in des_liste):
             continue
         else:
             des_liste.append(des[f"de{random_number_liste}"][random_number_face])
-    return des_liste
+    generateur = [number_of_dices,des_liste]
+    return generateur
 
 #Fonction qui va générer la grille selon la taille demandée et en utilisant les dés "randomized"
-def generer_grille(taille):
-    if taille == "4x4":
-        print('4x4')
-        return
-    elif taille == "5x5":
-        print('5x5')
-        return
-    elif taille == "6x6":
-        print('6x6')
-        return
+def generer_grille(generateur,input_joueur):
+    for j in range((int(input_joueur[1])*4)+1):
+                if (j==int(input_joueur[1])*4):
+                    print("-")
+                else:
+                    print("-",end="")
+    for i in range(1,generateur[0]+1):
+        if (i%int(input_joueur[1])==1):
+            print("|",generateur[1][i-1],"|",end=" ")
+        elif (i%int(input_joueur[1])==0):
+            print(generateur[1][i-1],"|")
+            for j in range((int(input_joueur[1])*4)+1):
+                if (j==int(input_joueur[1])*4):
+                    print("-")
+                else:
+                    print("-",end="")
+        else:
+            print(generateur[1][i-1],"|",end=" ")
 
 # Déclaration du code principal et Affichage
 
 def jouer():
-    input = inputjeu()
-    a=randomize_des(input)
-    return a
+    input_joueur = inputjeu()
+    generateur = randomize_des(input_joueur)
+    generer_grille(generateur,input_joueur)
+    return generer_grille
 
 print(jouer())
 
