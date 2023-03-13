@@ -60,8 +60,8 @@ def inputjeu():
         grille=input("Veuillez choisir une taille de grille (j x j) entre '4', '5' ou '6': ")
         if grille == "4" or grille == "5" or grille == "6" :
             break
-    userinput = [name,grille]
-    return userinput
+    input_joueur = [name,grille]
+    return input_joueur
 
 #Fonction qui va créer une liste de dés de manière aléatoire pour la création de la grille 
 def randomize_des(userinput):
@@ -83,7 +83,9 @@ def randomize_des(userinput):
     return generateur
 
 #Fonction qui va générer la grille selon la taille demandée et en utilisant les dés "randomized"
-def generer_grille(generateur,input_joueur):
+def generer_grille_et_joueurs(generateur,input_joueur,joueurs):
+    print(f"\nVoici les statistiques de départ des joueurs:\n{joueurs}\n")
+    print("Voici la grille de jeu:")
     for j in range((int(input_joueur[1])*4)+1):
                 if (j==int(input_joueur[1])*4):
                     print("-")
@@ -101,16 +103,27 @@ def generer_grille(generateur,input_joueur):
                     print("-",end="")
         else:
             print(generateur[1][i-1],"|",end=" ")
+    print("\n")
+
+def creation_du_joueur(input_joueur):
+    joueur1 = {"Joueur1":input_joueur[0]["name1"],"Nombre_de_mots":0,"Pointage":0}
+    joueur2 = {"Joueur2":input_joueur[0]["name2"],"Nombre_de_mots":0,"Pointage":0}
+    joueurs = [joueur1, joueur2]
+    return joueurs
+
 
 # Déclaration du code principal et Affichage
 
 def jouer():
     input_joueur = inputjeu()
+    joueurs=creation_du_joueur(input_joueur)
     generateur = randomize_des(input_joueur)
-    generer_grille(generateur,input_joueur)
-    return generer_grille
+    generer_grille_et_joueurs(generateur,input_joueur,joueurs)
+    
+    return generer_grille_et_joueurs
 
 print(jouer())
+
 
 def est_valide(grille, mot):
     return
