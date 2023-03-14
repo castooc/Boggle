@@ -15,6 +15,7 @@
 import random
 
 # Déclaration des variables globales, constantes
+mot="test" #valeur temporaire. doit être un input du joueur 1, et ensuite 2 etc#
 
 # Déclaration des dés sous forme de dictionnaire (donnés dans l"énoncé)
 des={"de1":["E", "T", "U", "K", "N", "O"],
@@ -124,9 +125,23 @@ def jouer():
 
 print(jouer())
 
+def est_valide(mot):
+    joueur = str(mot)
+    joueur = mot.strip()
+    if mot.isalpha() == True:
+        mot = mot.lower()
+        print(f"le mot {mot} est accepté. Veuillez confirmer que le mot est valide.")
+        return mot
+    else:
+        print("Mot illegal")     
+        #A ajouter: Mot noté et indiqué comme illégal dans le dictionnaire des mots du joueur, appeler le tour suivant#
 
-def est_valide(grille, mot):
-    return
+def mot_verif():
+            #A ajouter:#
+            #Variables requises: mot, joueur dont le tour est en cours, autre joueur#
+            #Insérer un input de la part du joueur pour validation ou refus du mot retenu.# 
+            #Si validé = Mot noté et indiqué comme accepté dans le dictionnaire des mots du joueur, ensuite appeler la fct calcul_point #
+            #Si refusé = Mot noté et indiqué comme refusé dans le dictionnaire des mots du joueur#  
 
 def calcul_point(grille, mots):
     return
