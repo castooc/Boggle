@@ -14,8 +14,9 @@
 # Déclaration des imports et dépendances
 import random
 
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
+
 # Déclaration des variables globales, constantes
-mot="test" #valeur temporaire. doit être un input du joueur 1, et ensuite 2 etc#
 
 # Déclaration des dés sous forme de dictionnaire (donnés dans l"énoncé)
 des={"de1":["E", "T", "U", "K", "N", "O"],
@@ -45,12 +46,17 @@ des={"de1":["E", "T", "U", "K", "N", "O"],
      "de25":["E", "D", "U", "F", "H", "K"],
      }
 
+#Déclaration d'un "flag" pour décider le tour de chaque joueur
 tour_joueur_cle = True
 
-# Déclaration des fonctions internes et calculs 
-# avec commentaires détaillés nécessaires seulement (optionnel)
+#valeur temporaire. doit être un input du joueur 1, et ensuite 2 etc#
+mot="test" 
 
-#Fonction qui va prendre en valeur les noms des 2 joueurs et la grandeur de la grille
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# Déclaration des fonctions internes et calculs 
+
+#Fonction qui prend en input les noms des 2 joueurs et la grandeur de la grille
 def input_noms_grille():
     name1=input("Veuillez entrez le nom du joueur 1: ")
     while name1 =="":
@@ -65,8 +71,15 @@ def input_noms_grille():
             break
     return [name,grille]
 
-#Fonction qui va créer une liste de dés de manière aléatoire pour la création de la grille 
-def randomize_des(userinput):
+#Fonction qui crée les statistiques des joueurs
+def statistiques_joueur(input_initial):
+    joueur1 = {"Joueur1":input_initial[0]["name1"],"Nombre_de_mots":0,"Pointage":0}
+    joueur2 = {"Joueur2":input_initial[0]["name2"],"Nombre_de_mots":0,"Pointage":0}
+    joueurs = [joueur1, joueur2]
+    return joueurs
+
+#Fonction qui crée une liste de dés de manière aléatoire pour la création de la grille 
+def generer_grille(userinput):
     if (userinput[1]== '4'):
         number_of_dices = 16
     elif (userinput[1] == '5'):
@@ -83,36 +96,29 @@ def randomize_des(userinput):
             des_liste.append(des[f"de{random_number_liste}"][random_number_face])
     return [number_of_dices,des_liste]
 
-#Fonction qui va générer la grille selon la taille demandée et en utilisant les dés "randomized"
-def generer_grille_et_joueurs(des_appendix,input_initial,joueurs):
-    print(f"\nVoici les statistiques de départ des joueurs:\n{joueurs}\n")
+#Fonction affiche la grille selon la taille demandée et en utilisant les dés "randomized"
+def affichage_grille_statistiques(generateur,input_initial,statistiques):
+    print(f"\nVoici les statistiques de départ des joueurs:\n{statistiques}\n")
     print("Voici la grille de jeu:")
     for j in range((int(input_initial[1])*4)+1):
                 if (j==int(input_initial[1])*4):
                     print("-")
                 else:
                     print("-",end="")
-    for i in range(1,des_appendix[0]+1):
+    for i in range(1,generateur[0]+1):
         if (i%int(input_initial[1])==1):
-            print("|",des_appendix[1][i-1],"|",end=" ")
+            print("|",generateur[1][i-1],"|",end=" ")
         elif (i%int(input_initial[1])==0):
-            print(des_appendix[1][i-1],"|")
+            print(generateur[1][i-1],"|")
             for j in range((int(input_initial[1])*4)+1):
                 if (j==int(input_initial[1])*4):
                     print("-")
                 else:
                     print("-",end="")
         else:
-            print(des_appendix[1][i-1],"|",end=" ")
+            print(generateur[1][i-1],"|",end=" ")
 
-def statistiques_joueur(input_initial):
-    joueur1 = {"Joueur1":input_initial[0]["name1"],"Nombre_de_mots":0,"Pointage":0}
-    joueur2 = {"Joueur2":input_initial[0]["name2"],"Nombre_de_mots":0,"Pointage":0}
-    joueurs = [joueur1, joueur2]
-    return joueurs
-
-# Déclaration du code principal et Affichage
-
+#Fonction qui détermine le tour de chaque joueur
 def tour_jeu():
     global tour_joueur_cle
     if (tour_joueur_cle == True):
@@ -121,6 +127,7 @@ def tour_jeu():
         tour_joueur_cle = True
     return tour_joueur_cle
 
+#Fonction qui reçoit les mots de chaque joueurs
 def input_joueur_mot(input_initial):
     tour_joueur = tour_jeu()
     if (tour_joueur == False) :
@@ -129,6 +136,7 @@ def input_joueur_mot(input_initial):
         mot = input(f"{input_initial[0]['name2']}, veuillez entrer un mot de 3 lettres minimum:\n")
     return mot
 
+#Fonction de vérification des mots
 def est_valide(grille, mot):
     joueur = str(mot)
     joueur = mot.strip()
@@ -149,24 +157,30 @@ def mot_verif():
             #Si validé = Mot noté et indiqué comme accepté dans le dictionnaire des mots du joueur, ensuite appeler la fct calcul_point #
             #Si refusé = Mot noté et indiqué comme refusé dans le dictionnaire des mots du joueur#  
 
+#Fonction de calcul des points de chaque joueur
 def calcul_point(grille, mots):
     return
 #VA CALCULER APRES LES POINTS ET LES POUSSER DANS LES STATS DU JOUEURS
 
-
+#Fonction principale en charge du déroulement du jeu/programme
 def jouer():
+#Création des inputs nécessaires ainsi que des statistiques des joueurs
     input_initial = input_noms_grille()
     statistiques= statistiques_joueur(input_initial)
-
-    des_appendix = randomize_des(input_initial)
-    generer_grille_et_joueurs(des_appendix,input_initial,statistiques)
-    
+#Création du générateur de dés aléatoires ainsi que l'affichage de la grille de jeu et des statistiques des joueurs
+    generateur = generer_grille(input_initial)
+    affichage_grille_statistiques(generateur,input_initial,statistiques)
+#Déroulement du jeu : input des joueurs sur les mots (appel aussi la fonction qui regarde les tours des joueurs)
     mot ="k"
     while mot!="":
         input_joueur_mot(input_initial)
+
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
+
+# Déclaration du code principal et Affichage
 jouer()
 
-
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
 #################################################################################
 # Tests
 def test() :
