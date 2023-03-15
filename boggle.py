@@ -58,12 +58,14 @@ mot="test"
 
 #Fonction qui prend en input les noms des 2 joueurs et la grandeur de la grille
 def input_noms_grille():
-    name1=input("Veuillez entrez le nom du joueur 1: ")
-    while name1 =="":
-        name1=input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 1: ")
-    name2=input("Veuillez entrez le nom du joueur 2: ")
-    while name2 =="":
-        name2=input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 2: ")
+    A = input("Veuillez entrer le nom du joueur 1: ")
+    name1 = A.strip()
+    while A =="":
+        A = input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 1: ")
+    B =input("Veuillez entrer le nom du joueur 2: ")
+    name2 = B.strip()
+    while B =="":
+        name2 = input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 2: ")
     name = {"name1":name1,"name2":name2}
     while True:
         grille=input("Veuillez choisir une taille de grille (j x j) entre '4', '5' ou '6': ")
