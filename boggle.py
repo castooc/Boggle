@@ -49,7 +49,7 @@ des={"de1":["E", "T", "U", "K", "N", "O"],
 #Déclaration d'un "flag" pour décider le tour de chaque joueur
 tour_joueur_cle = True
 
-#valeur temporaire. doit être un input du joueur 1, et ensuite 2 etc#
+#Déclaration d'une valeur temporaire.
 mot="test" 
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
