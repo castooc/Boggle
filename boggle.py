@@ -49,44 +49,42 @@ des={"de1":["E", "T", "U", "K", "N", "O"],
 #Déclaration d'un "flag" pour décider le tour de chaque joueur
 tour_joueur_cle = True
 
-#Déclaration d'une valeur temporaire.
-mot="test" 
-
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Déclaration des fonctions internes et calculs 
 
 #Fonction qui prend en input les noms des 2 joueurs et la grandeur de la grille
-def input_noms_grille():
-    A = input("Veuillez entrer le nom du joueur 1: ")
-    name1 = A.strip()
-    while A =="":
-        A = input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 1: ")
-    B =input("Veuillez entrer le nom du joueur 2: ")
-    name2 = B.strip()
-    while B =="":
-        name2 = input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 2: ")
-    name = {"name1":name1,"name2":name2}
+def input_noms():
+    name1 = input("Veuillez entrer le nom du joueur 1: ").strip()
+    while name1 =="":
+        name1 = input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 1: ").strip()
+    name2 =input("Veuillez entrer le nom du joueur 2: ").strip()
+    while name2 =="":
+        name2 = input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 2: ").strip()
+    return [name1,name2]
+
+#Fonction qui prend en input la grandeur de la grille
+def input_taille_grille():
     while True:
-        grille=input("Veuillez choisir une taille de grille (j x j) entre '4', '5' ou '6': ")
-        if grille == "4" or grille == "5" or grille == "6" :
+        taille_grille=input("Veuillez choisir une taille de grille (j x j) entre '4', '5' ou '6': ")
+        if taille_grille == "4" or taille_grille == "5" or taille_grille == "6" :
             break
-    return [name,grille]
+    return int(taille_grille)
 
 #Fonction qui crée les statistiques des joueurs
-def statistiques_joueur(input_initial):
-    joueur1 = {"Joueur1":input_initial[0]["name1"],"Nombre_de_mots":0,"Pointage":0}
-    joueur2 = {"Joueur2":input_initial[0]["name2"],"Nombre_de_mots":0,"Pointage":0}
+def statistiques(input_noms):
+    joueur1 = {"Joueur1":input_noms[0],"Mots":{},"Statut":{},"Pointage":{},"Total":0}
+    joueur2 = {"Joueur2":input_noms[1],"Mots":{},"Statut":{},"Pointage":{},"Total":0}
     joueurs = [joueur1, joueur2]
     return joueurs
 
 #Fonction qui crée une liste de dés de manière aléatoire pour la création de la grille 
-def generer_grille(userinput):
-    if (userinput[1]== '4'):
+def generer_grille(input_taille_grille):
+    if (input_taille_grille== 4):
         number_of_dices = 16
-    elif (userinput[1] == '5'):
+    elif (input_taille_grille== 5):
         number_of_dices = 25
-    elif (userinput[1] == '6'):
+    elif (input_taille_grille== 6):
         number_of_dices = 36
     des_liste = []
     while len(des_liste)<number_of_dices:  
@@ -96,29 +94,32 @@ def generer_grille(userinput):
             continue
         else:
             des_liste.append(des[f"de{random_number_liste}"][random_number_face])
-    return [number_of_dices,des_liste]
+    return [input_taille_grille,number_of_dices,des_liste]
 
-#Fonction affiche la grille selon la taille demandée et en utilisant les dés "randomized"
-def affichage_grille_statistiques(generateur,input_initial,statistiques):
-    print(f"\nVoici les statistiques de départ des joueurs:\n{statistiques}\n")
+#Fonction qui affiche les statistiques des joueurs
+def affichage_statistiques(statistiques):
+    print(f"\nVoici les statistiques de départ des joueurs:\n{statistiques[0]}\n{statistiques[1]}\n")
+
+#Fonction qui affiche la grille selon la taille demandée et en utilisant les dés "randomized"
+def affichage_grille(generateur):
     print("Voici la grille de jeu:")
-    for j in range((int(input_initial[1])*4)+1):
-                if (j==int(input_initial[1])*4):
+    for j in range((generateur[0]*4)+1):
+                if (j==generateur[0]*4):
                     print("-")
                 else:
                     print("-",end="")
-    for i in range(1,generateur[0]+1):
-        if (i%int(input_initial[1])==1):
-            print("|",generateur[1][i-1],"|",end=" ")
-        elif (i%int(input_initial[1])==0):
-            print(generateur[1][i-1],"|")
-            for j in range((int(input_initial[1])*4)+1):
-                if (j==int(input_initial[1])*4):
+    for i in range(1,generateur[1]+1):
+        if (i%generateur[0]==1):
+            print("|",generateur[2][i-1],"|",end=" ")
+        elif (i%generateur[0]==0):
+            print(generateur[2][i-1],"|")
+            for j in range((generateur[0]*4)+1):
+                if (j==generateur[0]*4):
                     print("-")
                 else:
                     print("-",end="")
         else:
-            print(generateur[1][i-1],"|",end=" ")
+            print(generateur[2][i-1],"|",end=" ")
 
 #Fonction qui détermine le tour de chaque joueur
 def tour_jeu():
@@ -130,52 +131,66 @@ def tour_jeu():
     return tour_joueur_cle
 
 #Fonction qui reçoit les mots de chaque joueurs
-def input_joueur_mot(input_initial):
+def input_joueur_mot(noms):
     tour_joueur = tour_jeu()
     if (tour_joueur == False) :
-        mot = input(f"{input_initial[0]['name1']}, veuillez entrer un mot de 3 lettres minimum:\n")
+        mot = input(f"{noms[0]}, veuillez entrer un mot de 3 lettres minimum:\n")
     else:
-        mot = input(f"{input_initial[0]['name2']}, veuillez entrer un mot de 3 lettres minimum:\n")
+        mot = input(f"{noms[1]}, veuillez entrer un mot de 3 lettres minimum:\n")
     return mot
 
-#Fonction de vérification des mots
-def est_valide(grille, mot):
-    joueur = str(mot)
-    joueur = mot.strip()
-    if mot.isalpha() == True:
-        mot = mot.lower()
-        print(f"le mot {mot} est accepté. Veuillez confirmer que le mot est valide.")
-        return mot
-    else:
-        print("Mot illegal")     
-        #A ajouter: Mot noté et indiqué comme illégal dans le dictionnaire des mots du joueur, appeler le tour suivant#
-# CEST LA QUON VA DEMANDER AU JOUEUR ADVERSE SI IL VEUT REJETER LE MOT OU PAS, ET AUSSI VOIR SI LE MOT EST INEGAL
+#Fonction de vérification de mots par le système (légal ou illégal)
+def est_illegal():
+    return
+
+#Fonction de vérification des mots par le joueur adverse (valide ou rejeté)
+def est_valide(noms, mot):
+    decision = ""
+    while (decision != "o" and decision!= "n"):
+        if (tour_joueur_cle == True) :
+            decision = input(f"{noms[0]}, veuillez dire si le mot de {noms[1]} est valide ou rejeté (o/n):\n")
+        else:
+            decision = input(f"{noms[1]}, veuillez dire si le mot de {noms[0]} est valide ou rejeté (o/n):\n")
+    # if (decision == "o") :
+        
+    return decision
+#Si validé = Mot noté et indiqué comme accepté dans le dictionnaire des mots du joueur, ensuite appeler la fct calcul_point #
+#Si refusé = Mot noté et indiqué comme refusé dans le dictionnaire des mots du joueur#  
+
+
+#Fonction qui va mettre à jour les statistiques des joueurs pendant le jeu
+def stats_append():
+    return
+
 
 def mot_verif():
     return
             #A ajouter:#
             #Variables requises: mot, joueur dont le tour est en cours, autre joueur#
             #Insérer un input de la part du joueur pour validation ou refus du mot retenu.# 
-            #Si validé = Mot noté et indiqué comme accepté dans le dictionnaire des mots du joueur, ensuite appeler la fct calcul_point #
-            #Si refusé = Mot noté et indiqué comme refusé dans le dictionnaire des mots du joueur#  
 
 #Fonction de calcul des points de chaque joueur
 def calcul_point(grille, mots):
     return
-#VA CALCULER APRES LES POINTS ET LES POUSSER DANS LES STATS DU JOUEURS
+#VA CALCULER LES POINTS en regardant les stats des joueurs
 
 #Fonction principale en charge du déroulement du jeu/programme
 def jouer():
-#Création des inputs nécessaires ainsi que des statistiques des joueurs
-    input_initial = input_noms_grille()
-    statistiques= statistiques_joueur(input_initial)
-#Création du générateur de dés aléatoires ainsi que l'affichage de la grille de jeu et des statistiques des joueurs
-    generateur = generer_grille(input_initial)
-    affichage_grille_statistiques(generateur,input_initial,statistiques)
-#Déroulement du jeu : input des joueurs sur les mots (appel aussi la fonction qui regarde les tours des joueurs)
-    mot ="k"
-    while mot!="":
-        input_joueur_mot(input_initial)
+    #Création des inputs nécessaires
+    noms = input_noms()
+    taille_grille = input_taille_grille()
+    #Création des statistiques des joueurs
+    stats = statistiques(noms)
+    #Création du générateur de dés aléatoires
+    generateur = generer_grille(taille_grille)
+    #Affichage de la grille et des statistiques des joueurs
+    affichage_statistiques(stats)
+    affichage_grille(generateur)
+    #Déroulement du jeu : input des joueurs sur les mots (appel aussi la fonction qui regarde les tours des joueurs)
+    mot = 'ift'
+    while mot !="":
+        mot = input_joueur_mot(noms)
+        est_valide(noms,mot)
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
 
@@ -183,6 +198,7 @@ def jouer():
 jouer()
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
+
 #################################################################################
 # Tests
 def test() :
