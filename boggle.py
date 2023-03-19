@@ -50,10 +50,10 @@ des={"de1":["E", "T", "U", "K", "N", "O"],
      "de29":["A", "I", "M", "S", "O", "R"],
      "de30":["E", "N", "H", "R", "I", "S"],
      "de31":["A", "T", "S", "I", "O", "U"],
-     "de32":["W", "I", "R", "E", "B", "C"],
+     "de32":["E", "I", "R", "E", "B", "C"],
      "de33":["S", "P", "U", "L", "T", "E"],
      "de34":["A", "C", "F", "L", "N", "E"],
-     "de35":["P", "R", "S", "T", "U", "G"],
+     "de35":["R", "E", "C", "A", "L", "S"],
      "de36":["E", "N", "T", "D", "O", "S"],
      }
 
@@ -95,12 +95,7 @@ def statistiques(input_noms):
 
 #Fonction qui crée une liste de dés de manière aléatoire pour la création de la grille 
 def generer_grille(input_taille_grille):
-    if (input_taille_grille== 4):
-        number_of_dices = 16
-    elif (input_taille_grille== 5):
-        number_of_dices = 25
-    elif (input_taille_grille== 6):
-        number_of_dices = 36
+    number_of_dices = input_taille_grille**2
     des_liste = []
     while len(des_liste)<number_of_dices:  
         random_number_liste = random.randint(1,number_of_dices)
@@ -109,33 +104,32 @@ def generer_grille(input_taille_grille):
             continue
         else:
             des_liste.append(des[f"de{random_number_liste}"][random_number_face])
-    print([input_taille_grille,number_of_dices,des_liste])
-    return [input_taille_grille,number_of_dices,des_liste]
+    des_matrice=[]
+    for i in range(input_taille_grille):
+        des_sous_matrice=[]
+        for j in range(input_taille_grille):
+            des_sous_matrice.append(des_liste[input_taille_grille*i+j])
+        des_matrice.append(des_sous_matrice)
+    print([input_taille_grille,number_of_dices,des_matrice])
+    return [input_taille_grille,number_of_dices,des_matrice]
 
 #Fonction qui affiche les statistiques des joueurs
 def affichage_statistiques(statistiques):
     print(f"\nVoici les statistiques des joueurs:\n{statistiques[0]}\n{statistiques[1]}\n")
 
-#Fonction qui affiche la grille selon la taille demandée et en utilisant les dés "randomized"
+#Fonction qui affiche la grille selon la taille demandée et en utilisant la matrice de dés aléatoires
 def affichage_grille(generateur):
     print("Voici la grille de jeu:")
-    for j in range((generateur[0]*4)+1):
-                if (j==generateur[0]*4):
-                    print("-")
-                else:
-                    print("-",end="")
-    for i in range(1,generateur[1]+1):
-        if (i%generateur[0]==1):
-            print("|",generateur[2][i-1],"|",end=" ")
-        elif (i%generateur[0]==0):
-            print(generateur[2][i-1],"|")
-            for j in range((generateur[0]*4)+1):
-                if (j==generateur[0]*4):
-                    print("-")
-                else:
-                    print("-",end="")
-        else:
-            print(generateur[2][i-1],"|",end=" ")
+    for _ in range(generateur[0]*4):
+        print("-",end="")
+    print("-")
+    for i in generateur[2]:
+        for j in i:
+            print("|",j,end=" ")
+        print("|")
+        for _ in range(generateur[0]*4):
+            print("-",end="")
+        print("-")
 
 #Fonction qui détermine le tour de chaque joueur
 def tour_jeu():
@@ -155,6 +149,11 @@ def input_joueur_mot(noms):
         mot = input(f"{noms[1]}, veuillez entrer un mot de 3 lettres minimum:\n")
     return mot
 
+#Fonction vérifiant si le mot se retrouve dans la grille
+def est_dans_grille(mot):
+    
+    return
+
 #Fonction de vérification de mots par le système (légal ou illégal)
 def est_legal(mot):
     mot= mot.strip()
@@ -171,9 +170,6 @@ def est_legal(mot):
             #il faut que le mot ne soit pas repeter, donc lorsquil est pris le mot ne peut pas etre redit
             #prendre position de la premiere lettre
 
-def est_dans_grille(mot):
-    return
-
 #Fonction de vérification des mots par le joueur adverse (valide ou rejeté)
 def est_valide(noms, mot):
     decision = ""
@@ -187,9 +183,6 @@ def est_valide(noms, mot):
     else:
         stats_append(mot,"Rejeté",0)
         return False
-#Si validé = Mot noté et indiqué comme accepté dans le dictionnaire des mots du joueur, ensuite appeler la fct calcul_point #
-#Si refusé = Mot noté et indiqué comme refusé dans le dictionnaire des mots du joueur#  
-
 
 #Fonction qui va mettre à jour les statistiques des joueurs pendant le jeu
 def stats_append(mot,string,pointage):
@@ -204,7 +197,9 @@ def stats_append(mot,string,pointage):
     return
 
 #Fonction de calcul des points de chaque joueur
-def calcul_point(grille, mots):
+def calcul_point():
+    stats[0]["Total"]=sum(stats[0]["Pointage"])
+    stats[1]["Total"]=sum(stats[1]["Pointage"])
     return
 #VA CALCULER LES POINTS en regardant les stats des joueurs
 
@@ -226,8 +221,7 @@ def jouer():
         else:
             stats_append(mot,"Accepté",1)
     #Calcul des totaux à la fin du jeu
-    stats[0]["Total"]=sum(stats[0]["Pointage"])
-    stats[1]["Total"]=sum(stats[1]["Pointage"])
+    calcul_point()
     affichage_statistiques(stats)
     return
 
@@ -242,11 +236,13 @@ taille_grille = input_taille_grille()
 stats = statistiques(noms)
 #Création du générateur de dés aléatoires
 generateur = generer_grille(taille_grille)
-
+#Déroulement du jeu
 jouer()
 #Fin du jeu
 print("Le jeu est terminé!")
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
+
+#mettre nombre de tour max en input et selon le nombre de joueurs
 
 #################################################################################
 # Tests
