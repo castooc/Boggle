@@ -62,7 +62,7 @@ tour_joueur_cle = True
 
 #Déclaration du compteur de tours et du nombre de tours max
 nombre_tour_counter = 0
-nombre_tour_max = 4
+nombre_tour_max = 10
 
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -149,10 +149,32 @@ def input_joueur_mot(noms):
         mot = input(f"{noms[1]}, veuillez entrer un mot de 3 lettres minimum:\n")
     return mot
 
+#Fonction faisant la transpose de notre matrice de dés (source : Louis-Edouard Lafontant, IFT-1015)
+def transpose(matrice):
+    matrice_trans = [None] * len(matrice[0])
+    for i in range(len(matrice_trans)):
+        matrice_trans[i] = []
+        for j in range(len(matrice)):
+            matrice_trans[i].append(matrice[j][i])
+    return matrice_trans   
+
 #Fonction vérifiant si le mot se retrouve dans la grille
-def est_dans_grille(mot):
-    
-    return
+def est_dans_grille(mot,generateur):
+    for i in range(generateur[0]):
+        matrix_to_string_row = "".join(generateur[2][i])
+        matrix_to_string_row_reverse = matrix_to_string_row[::-1]
+        matrix_trans = transpose(generateur[2])
+        matrix_to_string_col = "".join(matrix_trans[i])
+        matrix_to_string_col_reverse = matrix_to_string_col[::-1]
+        find_word_row = matrix_to_string_row.find(mot)
+        find_word_row_reverse = matrix_to_string_row_reverse.find(mot)
+        find_word_col = matrix_to_string_col.find(mot)
+        find_word_col_reverse = matrix_to_string_col_reverse.find(mot)
+        if find_word_row == -1 and find_word_col == -1 and find_word_row_reverse  == -1 and find_word_col_reverse == -1:
+           continue
+        else :
+           return True
+    return False
 
 #Fonction de vérification de mots par le système (légal ou illégal)
 def est_legal(mot):
@@ -161,24 +183,21 @@ def est_legal(mot):
         print('Le mot est illégal')
         stats_append(mot,"Illégal",0)
         return False
-    # elif
-    return True
-            #A ajouter:#
-            #les accents é è ê doivent être e voir demo wordle equiv letter
-            #Variables requises: mot, joueur dont le tour est en cours, autre joueur#
-            #Insérer un input de la part du joueur pour validation ou refus du mot retenu.# 
-            #il faut que le mot ne soit pas repeter, donc lorsquil est pris le mot ne peut pas etre redit
-            #prendre position de la premiere lettre
+    elif est_dans_grille(mot,generateur)==False:
+        print('Le mot est illégal')
+        stats_append(mot,"Illégal",0)
+        return False
+    return True   
 
 #Fonction de vérification des mots par le joueur adverse (valide ou rejeté)
 def est_valide(noms, mot):
     decision = ""
-    while (decision != "o" and decision!= "n"):
+    while (decision != "O" and decision!= "N"):
         if (tour_joueur_cle == True) :
-            decision = input(f"{noms[0]}, veuillez dire si le mot de {noms[1]} est valide ou rejeté (o/n):\n")
+            decision = input(f"{noms[0]}, veuillez dire si le mot de {noms[1]} est valide ou rejeté (O/N):\n")
         else:
-            decision = input(f"{noms[1]}, veuillez dire si le mot de {noms[0]} est valide ou rejeté (o/n):\n")
-    if (decision == "o") :
+            decision = input(f"{noms[1]}, veuillez dire si le mot de {noms[0]} est valide ou rejeté (O/N):\n")
+    if (decision == "O") :
         return True
     else:
         stats_append(mot,"Rejeté",0)
@@ -242,7 +261,17 @@ jouer()
 print("Le jeu est terminé!")
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
 
+#si le joueur met un vide, finir son tour pour de bon
+#critere majusucule minuscule, isalpha pour le input de mots
 #mettre nombre de tour max en input et selon le nombre de joueurs
+#calcul de points
+#faire une table de vocabulaire anglais francais (row = ligne for example)
+#les accents é è ê doivent être e voir demo wordle equiv letter
+#Variables requises: mot, joueur dont le tour est en cours, autre joueur#
+#Insérer un input de la part du joueur pour validation ou refus du mot retenu.# 
+#il faut que le mot ne soit pas repeter, donc lorsquil est pris le mot ne peut pas etre redit
+#prendre position de la premiere lettre
+#relire lenonce du devoir et aussi les reponse des questions studium
 
 #################################################################################
 # Tests
