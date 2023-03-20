@@ -57,26 +57,24 @@ des={"de1":["E", "T", "U", "K", "N", "O"],
      "de36":["E", "N", "T", "D", "O", "S"],
      }
 
-#Déclaration d'un "flag" pour décider le tour de chaque joueur
-tour_joueur_cle = True
-
-#Déclaration du compteur de tours et du nombre de tours max
-nombre_tour_counter = 0
-nombre_tour_max = 10
-
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Déclaration des fonctions internes et calculs 
 
-#Fonction qui prend en input les noms des 2 joueurs et la grandeur de la grille
-def input_noms():
-    name1 = input("Veuillez entrer le nom du joueur 1: ").strip()
-    while name1 =="":
-        name1 = input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 1: ").strip()
-    name2 =input("Veuillez entrer le nom du joueur 2: ").strip()
-    while name2 =="":
-        name2 = input("Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur 2: ").strip()
-    return [name1,name2]
+def input_joueurs():
+    nombre_joueurs=""
+    while nombre_joueurs =="" or nombre_joueurs.isdigit()==False:
+        nombre_joueurs = input("Veuillez entrer le nombre de joueur").strip()
+    return int(nombre_joueurs)
+
+#Fonction qui prend en input les noms des joueurs et la grandeur de la grille
+def input_noms(nombre_joueurs):
+    names = [None]*nombre_joueurs
+    for i in range(nombre_joueurs): 
+        names[i]= input(f"Veuillez entrer le nom du joueur {i+1}: ").strip()
+        while names[i] =="":
+            names[i] = input(f"Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur {i+1}: ").strip()
+    return names
 
 #Fonction qui prend en input la grandeur de la grille
 def input_taille_grille():
@@ -88,9 +86,9 @@ def input_taille_grille():
 
 #Fonction qui crée les statistiques des joueurs
 def statistiques(input_noms):
-    joueur1 = {"Joueur1":input_noms[0],"Mots":[],"Statut":[],"Pointage":[],"Total":0}
-    joueur2 = {"Joueur2":input_noms[1],"Mots":[],"Statut":[],"Pointage":[],"Total":0}
-    joueurs = [joueur1, joueur2]
+    joueurs = [None]*len(input_noms)
+    for i in range(len(input_noms)):
+        joueurs[i] = {f"Joueur{i+1}":input_noms[i],"Mots":[],"Statut":[],"Pointage":[],"Total":0}
     return joueurs
 
 #Fonction qui crée une liste de dés de manière aléatoire pour la création de la grille 
@@ -110,12 +108,13 @@ def generer_grille(input_taille_grille):
         for j in range(input_taille_grille):
             des_sous_matrice.append(des_liste[input_taille_grille*i+j])
         des_matrice.append(des_sous_matrice)
-    print([input_taille_grille,number_of_dices,des_matrice])
     return [input_taille_grille,number_of_dices,des_matrice]
 
 #Fonction qui affiche les statistiques des joueurs
 def affichage_statistiques(statistiques):
-    print(f"\nVoici les statistiques des joueurs:\n{statistiques[0]}\n{statistiques[1]}\n")
+    print("\nVoici les statistiques des joueurs:")
+    for i in range(nombre_joueurs):
+        print(statistiques[i])
 
 #Fonction qui affiche la grille selon la taille demandée et en utilisant la matrice de dés aléatoires
 def affichage_grille(generateur):
@@ -133,20 +132,14 @@ def affichage_grille(generateur):
 
 #Fonction qui détermine le tour de chaque joueur
 def tour_jeu():
-    global tour_joueur_cle
-    if (tour_joueur_cle == True):
-        tour_joueur_cle = False
-    else:
-        tour_joueur_cle = True
-    return tour_joueur_cle
+    global nombre_tour_counter
+    nombre_tour_counter+=1
 
 #Fonction qui reçoit les mots de chaque joueurs
 def input_joueur_mot(noms):
-    tour_joueur = tour_jeu()
-    if (tour_joueur == False) :
-        mot = input(f"{noms[0]}, veuillez entrer un mot de 3 lettres minimum:\n")
-    else:
-        mot = input(f"{noms[1]}, veuillez entrer un mot de 3 lettres minimum:\n")
+    for i in range(nombre_joueurs):
+        if nombre_tour_counter%nombre_joueurs == i :
+            mot = input(f"{noms[i]}, veuillez entrer un mot de 3 lettres minimum:\n")
     return mot
 
 #Fonction faisant la transpose de notre matrice de dés (source : Louis-Edouard Lafontant, IFT-1015)
@@ -187,16 +180,24 @@ def est_legal(mot):
         print('Le mot est illégal')
         stats_append(mot,"Illégal",0)
         return False
+    # for i in nombre_joueurs
+        # if mot in stats
+#   joueur1 = {"Joueur1":input_noms[0],"Mots":[],"Statut":[],"Pointage":[],"Total":0}
+#     joueur2 = {"Joueur2":input_noms[1],"Mots":[],"Statut":[],"Pointage":[],"Total":0}
+#     joueurs = [joueur1, jou
     return True   
 
 #Fonction de vérification des mots par le joueur adverse (valide ou rejeté)
 def est_valide(noms, mot):
     decision = ""
     while (decision != "O" and decision!= "N"):
-        if (tour_joueur_cle == True) :
-            decision = input(f"{noms[0]}, veuillez dire si le mot de {noms[1]} est valide ou rejeté (O/N):\n")
-        else:
-            decision = input(f"{noms[1]}, veuillez dire si le mot de {noms[0]} est valide ou rejeté (O/N):\n")
+        for i in range(nombre_joueurs):
+            if nombre_tour_counter%nombre_joueurs == nombre_joueurs-1 :
+                decision = input(f"{noms[0]}, veuillez dire si le mot de {noms[nombre_joueurs-1]} est valide (O) ou rejeté (N) (O/N):\n").upper()
+                break
+            elif nombre_tour_counter%nombre_joueurs == i :
+                decision = input(f"{noms[i+1]}, veuillez dire si le mot de {noms[i]} est valide (O) ou rejeté (N) (O/N):\n").upper()
+                break
     if (decision == "O") :
         return True
     else:
@@ -205,22 +206,18 @@ def est_valide(noms, mot):
 
 #Fonction qui va mettre à jour les statistiques des joueurs pendant le jeu
 def stats_append(mot,string,pointage):
-    if (tour_joueur_cle == False) :
-            stats[0]["Mots"].append(mot)
-            stats[0]["Statut"].append(string)
-            stats[0]["Pointage"].append(pointage)
-    elif (tour_joueur_cle == True) :
-            stats[1]["Mots"].append(mot)
-            stats[1]["Statut"].append(string)
-            stats[1]["Pointage"].append(pointage)
-    return
+     for i in range(nombre_joueurs):
+        if nombre_tour_counter%nombre_joueurs == i :
+            stats[i]["Mots"].append(mot)
+            stats[i]["Statut"].append(string)
+            stats[i]["Pointage"].append(pointage)
+        else:
+            continue
 
 #Fonction de calcul des points de chaque joueur
 def calcul_point():
-    stats[0]["Total"]=sum(stats[0]["Pointage"])
-    stats[1]["Total"]=sum(stats[1]["Pointage"])
-    return
-#VA CALCULER LES POINTS en regardant les stats des joueurs
+    for i in range(nombre_joueurs):
+        stats[i]["Total"]=sum(stats[i]["Pointage"])
 
 #Fonction principale en charge du déroulement du jeu/programme
 def jouer():  
@@ -231,14 +228,16 @@ def jouer():
     affichage_grille(generateur)
     #Déroulement du jeu : input des joueurs sur les mots (appel aussi la fonction qui regarde les tours des joueurs)
     while (nombre_tour_counter < nombre_tour_max):
-        nombre_tour_counter+=1
-        mot = input_joueur_mot(noms)
+        mot = input_joueur_mot(noms).upper()
         if (est_legal(mot)==False):
+            tour_jeu()
             continue
         elif (est_valide(noms,mot)==False):
+            tour_jeu()
             continue
         else:
             stats_append(mot,"Accepté",1)
+            tour_jeu()
     #Calcul des totaux à la fin du jeu
     calcul_point()
     affichage_statistiques(stats)
@@ -248,9 +247,14 @@ def jouer():
 
 # Déclaration du code principal et Affichage
 
+#Déclaration du compteur de tours
+nombre_tour_counter = 0
 #Création des inputs nécessaires (noms et taille de la grille)
-noms = input_noms()
+nombre_joueurs = input_joueurs()
+noms = input_noms(nombre_joueurs)
 taille_grille = input_taille_grille()
+#Création du nombre de tours maximum se basant sur le nombre de joueurs
+nombre_tour_max = 2*nombre_joueurs
 #Création des statistiques des joueurs
 stats = statistiques(noms)
 #Création du générateur de dés aléatoires
@@ -261,17 +265,17 @@ jouer()
 print("Le jeu est terminé!")
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
 
+
+#modulo pour nombre de joueurs
+#ajout point par mots : #VA CALCULER LES POINTS en regardant les stats des joueurs
 #si le joueur met un vide, finir son tour pour de bon
-#critere majusucule minuscule, isalpha pour le input de mots
+#il faut que le mot ne soit pas repeter, donc lorsquil est pris le mot ne peut pas etre redit
 #mettre nombre de tour max en input et selon le nombre de joueurs
 #calcul de points
 #faire une table de vocabulaire anglais francais (row = ligne for example)
 #les accents é è ê doivent être e voir demo wordle equiv letter
-#Variables requises: mot, joueur dont le tour est en cours, autre joueur#
-#Insérer un input de la part du joueur pour validation ou refus du mot retenu.# 
-#il faut que le mot ne soit pas repeter, donc lorsquil est pris le mot ne peut pas etre redit
-#prendre position de la premiere lettre
 #relire lenonce du devoir et aussi les reponse des questions studium
+#CHANGER LE NOMBRE DE TOUR A 10*NOMBRE DE JOUEUR
 
 #################################################################################
 # Tests
