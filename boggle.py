@@ -57,6 +57,11 @@ des={"de1":["E", "T", "U", "K", "N", "O"],
      "de36":["E", "N", "T", "D", "O", "S"],
      }
 
+# Déclaration des points par mot selon la taille de la grille (donnés dans l"énoncé)
+grille_4x4 = {"3":1,"4":2,"5":3,"6":5,"7":8,"8":10}
+grille_5x5 = {"3":1,"4":2,"5":3,"6":4,"7":6,"8":10}
+grille_6x6 = {"3":1,"4":2,"5":3,"6":5,"7":7,"8":10,"9":12}
+
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 # Déclaration des fonctions internes et calculs 
@@ -214,8 +219,18 @@ def stats_append(mot,string,pointage):
         else:
             continue
 
+#Fonction de calcul des points selon la longueur des mots
+def calcul_point(mot):
+    longueur_mot = len(mot)
+    if taille_grille == 4 : 
+        return grille_4x4[f"{longueur_mot}"]
+    elif taille_grille == 5 : 
+        return grille_5x5[f"{longueur_mot}"]
+    elif taille_grille == 6 : 
+        return grille_6x6[f"{longueur_mot}"]
+
 #Fonction de calcul des points de chaque joueur
-def calcul_point():
+def calcul_total():
     for i in range(nombre_joueurs):
         stats[i]["Total"]=sum(stats[i]["Pointage"])
 
@@ -236,10 +251,11 @@ def jouer():
             tour_jeu()
             continue
         else:
-            stats_append(mot,"Accepté",1)
+            points = calcul_point(mot)
+            stats_append(mot,"Accepté",points)
             tour_jeu()
     #Calcul des totaux à la fin du jeu
-    calcul_point()
+    calcul_total()
     affichage_statistiques(stats)
     return
 
@@ -264,16 +280,13 @@ jouer()
 #Fin du jeu
 print("Le jeu est terminé!")
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
-
-
-#modulo pour nombre de joueurs
-#ajout point par mots : #VA CALCULER LES POINTS en regardant les stats des joueurs
 #si le joueur met un vide, finir son tour pour de bon
 #il faut que le mot ne soit pas repeter, donc lorsquil est pris le mot ne peut pas etre redit
 #mettre nombre de tour max en input et selon le nombre de joueurs
 #calcul de points
 #faire une table de vocabulaire anglais francais (row = ligne for example)
 #les accents é è ê doivent être e voir demo wordle equiv letter
+#faire les test unitaires
 #relire lenonce du devoir et aussi les reponse des questions studium
 #CHANGER LE NOMBRE DE TOUR A 10*NOMBRE DE JOUEUR
 
