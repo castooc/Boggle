@@ -74,12 +74,12 @@ def input_joueurs():
 
 #Fonction qui prend en input les noms des joueurs et la grandeur de la grille
 def input_noms(nombre_joueurs):
-    names = [None]*nombre_joueurs
+    noms = [None]*nombre_joueurs
     for i in range(nombre_joueurs): 
-        names[i]= input(f"Veuillez entrer le nom du joueur {i+1}: ").strip()
-        while names[i] =="":
-            names[i] = input(f"Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur {i+1}: ").strip()
-    return names
+        noms[i]= input(f"Veuillez entrer le nom du joueur {i+1}: ").strip()
+        while noms[i] =="":
+            noms[i] = input(f"Le nom ne peut être vide, veuillez entrer un nom valide pour le joueur {i+1}: ").strip()
+    return noms
 
 #Fonction qui prend en input la grandeur de la grille
 def input_taille_grille():
@@ -162,7 +162,7 @@ def input_joueur_mot(noms):
                 mot = input(f"{noms[i]}, veuillez entrer un mot de 3 lettres minimum:\n")
                 if mot =="" : return mot
                 elif mot in mots_matrice : 
-                    mot = mot.upper()+" (repeat)"
+                    mot = mot.upper()+" (REPEAT)"
                     return mot
                 mots_matrice.append(mot)
     return mot.upper()
@@ -197,22 +197,22 @@ def est_dans_grille(mot,generateur):
 #Fonction de vérification de mots par le système (légal ou illégal)
 def est_legal(mot):
     mot= mot.strip()
-    if mot.endswith("(repeat)"):
-        affichage_est_legal("repeat")
-        stats_append(mot,"Illégal",0)
+    if mot.endswith("(REPEAT)"):
+        affichage_est_legal("REPEAT")
+        stats_append(mot,"ILLEGAL",0)
         return False
     if (mot.isalpha()==False or len(mot)<3 or len(mot)>generateur[0]):
         affichage_est_legal(" ")
-        stats_append(mot,"Illégal",0)
+        stats_append(mot,"ILLEGAL",0)
         return False
     elif est_dans_grille(mot,generateur)==False:
         affichage_est_legal(" ")
-        stats_append(mot,"Illégal",0)
+        stats_append(mot,"ILLEGAL",0)
         return False
     return True   
 
 def affichage_est_legal(message):
-    if message == "repeat":
+    if message == "REPEAT":
         print("Le mot a déjà été entré par un joueur, vous avez perdu votre tour")
     else:
         print('Le mot est illégal')
@@ -231,7 +231,7 @@ def est_valide(noms, mot):
     if (decision == "O") :
         return True
     else:
-        stats_append(mot,"Rejeté",0)
+        stats_append(mot,"REJETE",0)
         return False
 
 #Fonction qui va mettre à jour les statistiques des joueurs pendant le jeu
@@ -279,13 +279,32 @@ def jouer():
             continue
         else:
             points = calcul_point(mot)
-            stats_append(mot,"Accepté",points)
+            stats_append(mot,"ACCEPTE",points)
             tour_jeu()
     #Calcul des totaux à la fin du jeu
     calcul_total()
     affichage_statistiques(stats)
     return
 
+def affichage_fin_jeu(joueurs):
+    for i in range(nombre_joueurs):
+        print()
+        print(joueurs[i][f"Joueur{i+1}"])
+        print("---------------------------------------")
+        for j in range(len(joueurs[i]["Mots"])):
+            mot = joueurs[i]['Mots'][j]
+            space =" "*(14 - len(mot))
+            pointage = joueurs[i]['Pointage'][j]
+            if pointage == 0 :
+                pointage = "x"
+            statut = joueurs[i]['Statut'][j]
+            print(f"- {mot}{space}({pointage}) -- {statut}")
+        print("=======================================")
+        total = joueurs[i]["Total"]
+        print(f"TOTAL: {total}")   
+
+def gagnant():
+    return
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
 
 # Déclaration du code principal et Affichage
@@ -307,15 +326,14 @@ generateur = generer_grille(taille_grille)
 #Déroulement du jeu
 jouer()
 #Fin du jeu
-print("Le jeu est terminé!")
+affichage_fin_jeu(stats)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
-#il faut que le mot ne soit pas repeter, donc lorsquil est pris le mot ne peut pas etre redit
-#faire une table de vocabulaire anglais francais (row = ligne for example)
-#les accents é è ê doivent être e voir demo wordle equiv letter
-#append les trucs de maude
-#faire les test unitaires
+
+#define the winner
 #relire lenonce du devoir et aussi les reponse des questions studium
+#faire les test unitaires
 #CHANGER LE NOMBRE DE TOUR A 10*NOMBRE DE JOUEUR
+#les accents é è ê doivent être e voir demo wordle equiv letter
 
 #################################################################################
 # Tests
