@@ -69,7 +69,7 @@ grille_6x6 = {"3":1,"4":2,"5":3,"6":5,"7":7,"8":10,"9":12}
 def input_joueurs():
     nombre_joueurs=""
     while nombre_joueurs =="" or nombre_joueurs.isdigit()==False:
-        nombre_joueurs = input("Veuillez entrer le nombre de joueur").strip()
+        nombre_joueurs = input("Veuillez entrer le nombre de joueur: ").strip()
     return int(nombre_joueurs)
 
 #Fonction qui prend en input les noms des joueurs et la grandeur de la grille
@@ -283,28 +283,52 @@ def jouer():
             tour_jeu()
     #Calcul des totaux à la fin du jeu
     calcul_total()
-    affichage_statistiques(stats)
     return
 
-def affichage_fin_jeu(joueurs):
+def gagnant(stats):
+    highest_total = 0
+    gagnants_matrice = []
+    for i in range(nombre_joueurs):
+        current_total = stats[i]['Total']
+        if current_total>highest_total:
+            highest_total = current_total
+    if highest_total == 0 :
+        return gagnants_matrice
+    else:
+        for j in range(nombre_joueurs):
+            if stats[j]['Total'] == highest_total:
+                gagnants_matrice.append(stats[j][f"Joueur{j+1}"])
+    return gagnants_matrice
+
+def affichage_fin_jeu(stats):
     for i in range(nombre_joueurs):
         print()
-        print(joueurs[i][f"Joueur{i+1}"])
+        print(stats[i][f"Joueur{i+1}"])
         print("---------------------------------------")
-        for j in range(len(joueurs[i]["Mots"])):
-            mot = joueurs[i]['Mots'][j]
-            space =" "*(14 - len(mot))
-            pointage = joueurs[i]['Pointage'][j]
+        for j in range(len(stats[i]["Mots"])):
+            mot = stats[i]['Mots'][j]
+            space =" "*(16 - len(mot))
+            pointage = stats[i]['Pointage'][j]
             if pointage == 0 :
                 pointage = "x"
-            statut = joueurs[i]['Statut'][j]
+            statut = stats[i]['Statut'][j]
             print(f"- {mot}{space}({pointage}) -- {statut}")
         print("=======================================")
-        total = joueurs[i]["Total"]
-        print(f"TOTAL: {total}")   
+        total = stats[i]["Total"]
+        print(f"TOTAL: {total}")
+    gagnants = gagnant(stats)   
+    if len(gagnants)>1:
+        for i in range(len(gagnants)):
+            if i == len(gagnants)-1:
+                print(f"{gagnants[i]} ",end="")
+            else:
+                print(f"{gagnants[i]}, ",end="")
+        print("ont remporté la partie!")
+    elif len(gagnants) == 0 :
+        print("\nÉgalité!")
+    else: 
+        print(f"\n{gagnants[0]} a remporté la partie!")
 
-def gagnant():
-    return
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
 
 # Déclaration du code principal et Affichage
