@@ -140,12 +140,24 @@ def tour_jeu():
     global nombre_tour_counter
     nombre_tour_counter+=1
 
-#Fonction qui reçoit les mots de chaque joueurs
-def input_joueur_mot(noms):
+#Fonction ajoutant le joueur dans la liste d'abandon
+def joueur_abandon(noms):
     for i in range(nombre_joueurs):
         if nombre_tour_counter%nombre_joueurs == i :
-            mot = input(f"{noms[i]}, veuillez entrer un mot de 3 lettres minimum:\n")
-    return mot
+            joueurs_abandon_matrice.append(noms[i])
+
+#Fonction qui reçoit les mots de chaque joueurs
+def input_joueur_mot(noms):
+    global joueurs_abandon_matrice
+    for i in range(nombre_joueurs):
+        if nombre_tour_counter%nombre_joueurs == i :
+            if noms[i] in joueurs_abandon_matrice:
+                mot = ""
+                return mot
+            else:
+                mot = input(f"{noms[i]}, veuillez entrer un mot de 3 lettres minimum:\n")
+                if mot =="" : return mot
+    return mot.upper()
 
 #Fonction faisant la transpose de notre matrice de dés (source : Louis-Edouard Lafontant, IFT-1015)
 def transpose(matrice):
@@ -236,14 +248,17 @@ def calcul_total():
 
 #Fonction principale en charge du déroulement du jeu/programme
 def jouer():  
-    global nombre_tour_counter
-    global nombre_tour_max
     #Affichage de la grille et des statistiques des joueurs
     affichage_statistiques(stats)
     affichage_grille(generateur)
     #Déroulement du jeu : input des joueurs sur les mots (appel aussi la fonction qui regarde les tours des joueurs)
     while (nombre_tour_counter < nombre_tour_max):
-        mot = input_joueur_mot(noms).upper()
+        mot = input_joueur_mot(noms)
+        if mot =="":
+            print("Vous avez abandonné, vous ne pourrez pu ajouter des mots mais pouvez encore valider les mots du joueur précédent.")
+            joueur_abandon(noms)
+            tour_jeu()
+            continue
         if (est_legal(mot)==False):
             tour_jeu()
             continue
@@ -263,14 +278,15 @@ def jouer():
 
 # Déclaration du code principal et Affichage
 
-#Déclaration du compteur de tours
-nombre_tour_counter = 0
 #Création des inputs nécessaires (noms et taille de la grille)
 nombre_joueurs = input_joueurs()
 noms = input_noms(nombre_joueurs)
 taille_grille = input_taille_grille()
-#Création du nombre de tours maximum se basant sur le nombre de joueurs
+#Création du compteur de tours et du nombre de tours maximum se basant sur le nombre de joueurs
+nombre_tour_counter = 0
 nombre_tour_max = 2*nombre_joueurs
+#Initialisation de la matrice d'abandon
+joueurs_abandon_matrice = [None]*nombre_joueurs
 #Création des statistiques des joueurs
 stats = statistiques(noms)
 #Création du générateur de dés aléatoires
@@ -280,12 +296,10 @@ jouer()
 #Fin du jeu
 print("Le jeu est terminé!")
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
-#si le joueur met un vide, finir son tour pour de bon
 #il faut que le mot ne soit pas repeter, donc lorsquil est pris le mot ne peut pas etre redit
-#mettre nombre de tour max en input et selon le nombre de joueurs
-#calcul de points
 #faire une table de vocabulaire anglais francais (row = ligne for example)
 #les accents é è ê doivent être e voir demo wordle equiv letter
+#append les trucs de maude
 #faire les test unitaires
 #relire lenonce du devoir et aussi les reponse des questions studium
 #CHANGER LE NOMBRE DE TOUR A 10*NOMBRE DE JOUEUR
