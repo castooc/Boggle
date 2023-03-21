@@ -142,12 +142,16 @@ def tour_jeu():
 
 #Fonction ajoutant le joueur dans la liste d'abandon
 def joueur_abandon(noms):
+    global joueurs_abandon_matrice
     for i in range(nombre_joueurs):
         if nombre_tour_counter%nombre_joueurs == i :
             joueurs_abandon_matrice.append(noms[i])
+            break
+    print(f"{noms[i]} a abandonné, il ne peut pu ajouter des mots mais peut encore valider les mots du joueur précédent.")
 
 #Fonction qui reçoit les mots de chaque joueurs
 def input_joueur_mot(noms):
+    global mots_matrice
     global joueurs_abandon_matrice
     for i in range(nombre_joueurs):
         if nombre_tour_counter%nombre_joueurs == i :
@@ -157,6 +161,10 @@ def input_joueur_mot(noms):
             else:
                 mot = input(f"{noms[i]}, veuillez entrer un mot de 3 lettres minimum:\n")
                 if mot =="" : return mot
+                elif mot in mots_matrice : 
+                    mot = mot.upper()+" (repeat)"
+                    return mot
+                mots_matrice.append(mot)
     return mot.upper()
 
 #Fonction faisant la transpose de notre matrice de dés (source : Louis-Edouard Lafontant, IFT-1015)
@@ -189,20 +197,25 @@ def est_dans_grille(mot,generateur):
 #Fonction de vérification de mots par le système (légal ou illégal)
 def est_legal(mot):
     mot= mot.strip()
+    if mot.endswith("(repeat)"):
+        affichage_est_legal("repeat")
+        stats_append(mot,"Illégal",0)
+        return False
     if (mot.isalpha()==False or len(mot)<3 or len(mot)>generateur[0]):
-        print('Le mot est illégal')
+        affichage_est_legal(" ")
         stats_append(mot,"Illégal",0)
         return False
     elif est_dans_grille(mot,generateur)==False:
-        print('Le mot est illégal')
+        affichage_est_legal(" ")
         stats_append(mot,"Illégal",0)
         return False
-    # for i in nombre_joueurs
-        # if mot in stats
-#   joueur1 = {"Joueur1":input_noms[0],"Mots":[],"Statut":[],"Pointage":[],"Total":0}
-#     joueur2 = {"Joueur2":input_noms[1],"Mots":[],"Statut":[],"Pointage":[],"Total":0}
-#     joueurs = [joueur1, jou
     return True   
+
+def affichage_est_legal(message):
+    if message == "repeat":
+        print("Le mot a déjà été entré par un joueur, vous avez perdu votre tour")
+    else:
+        print('Le mot est illégal')
 
 #Fonction de vérification des mots par le joueur adverse (valide ou rejeté)
 def est_valide(noms, mot):
@@ -255,7 +268,6 @@ def jouer():
     while (nombre_tour_counter < nombre_tour_max):
         mot = input_joueur_mot(noms)
         if mot =="":
-            print("Vous avez abandonné, vous ne pourrez pu ajouter des mots mais pouvez encore valider les mots du joueur précédent.")
             joueur_abandon(noms)
             tour_jeu()
             continue
@@ -285,7 +297,8 @@ taille_grille = input_taille_grille()
 #Création du compteur de tours et du nombre de tours maximum se basant sur le nombre de joueurs
 nombre_tour_counter = 0
 nombre_tour_max = 2*nombre_joueurs
-#Initialisation de la matrice d'abandon
+#Initialisation de la matrice de mots déjà entrés et de la matrice d'abandon
+mots_matrice = []
 joueurs_abandon_matrice = [None]*nombre_joueurs
 #Création des statistiques des joueurs
 stats = statistiques(noms)
