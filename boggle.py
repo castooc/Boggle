@@ -96,7 +96,8 @@ def statistiques(input_noms):
         joueurs[i] = {f"Joueur{i+1}":input_noms[i],"Mots":[],"Statut":[],"Pointage":[],"Total":0}
     return joueurs
 
-#Fonction qui crée une liste de dés de manière aléatoire pour la création de la grille 
+#Fonction qui crée une liste de dés de manière aléatoire pour la création de la grille
+#Changer le paramètre "taille" pour "input_taille_grille" pour mieux réfléter d'où la variable vient (d'un input)
 def generer_grille(input_taille_grille):
     number_of_dices = input_taille_grille**2
     des_liste = []
@@ -218,6 +219,8 @@ def affichage_est_legal(message):
         print('Le mot est illégal')
 
 #Fonction de vérification des mots par le joueur adverse (valide ou rejeté)
+#Changer les paramètres "grille" et "mot" par "noms" et "mot", car la fonction va prendre le input des joueurs pour voir si le mot est accepté ou rejeté
+#Nous avons une autre fonction "est_legal" qui va regarder si le mot est legal ou illegal selon les règles du jeu
 def est_valide(noms, mot):
     decision = ""
     while (decision != "O" and decision!= "N"):
@@ -245,6 +248,7 @@ def stats_append(mot,string,pointage):
             continue
 
 #Fonction de calcul des points selon la longueur des mots
+#Changer les paramètres "grille" pour seulement inclure le mot et référer à la bonne matrice de points selon la taille de la grille
 def calcul_point(mot):
     longueur_mot = len(mot)
     if taille_grille == 4 : 
@@ -353,11 +357,12 @@ jouer()
 affichage_fin_jeu(stats)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
 
-#define the winner
-#relire lenonce du devoir et aussi les reponse des questions studium
-#faire les test unitaires
-#CHANGER LE NOMBRE DE TOUR A 10*NOMBRE DE JOUEUR
 #les accents é è ê doivent être e voir demo wordle equiv letter
+#demande de jouer une autre partie
+#relire lenonce du devoir et aussi les reponse des questions studium
+#bonuses
+#faire les test unitaires (5 tests min pour generer grille, estvalide et calculpoint)
+#CHANGER LE NOMBRE DE TOUR A 10*NOMBRE DE JOUEUR
 
 #################################################################################
 # Tests
