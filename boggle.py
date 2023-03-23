@@ -68,7 +68,7 @@ grille_6x6 = {"3":1,"4":2,"5":3,"6":5,"7":7,"8":10,"9":12}
 
 def input_joueurs():
     nombre_joueurs=""
-    while nombre_joueurs =="" or nombre_joueurs.isdigit()==False:
+    while nombre_joueurs =="" or nombre_joueurs.isdigit()==False or int(nombre_joueurs)<1:
         nombre_joueurs = input("Veuillez entrer le nombre de joueur: ").strip()
     return int(nombre_joueurs)
 
@@ -148,7 +148,18 @@ def joueur_abandon(noms):
         if nombre_tour_counter%nombre_joueurs == i :
             joueurs_abandon_matrice.append(noms[i])
             break
-    print(f"{noms[i]} a abandonné, il ne peut pu ajouter des mots mais peut encore valider les mots du joueur précédent.")
+    print(f"{noms[i]} a abandonné, il ne peut plus ajouter des mots mais peut encore valider les mots du joueur précédent.")
+
+#Fonction remplaçant les accents
+def matching(letter):
+    if letter in "éèêëàâùûîïôç" :
+        if letter in "éèêë": return "e"
+        if letter in "àâ": return "a"
+        if letter in "ùû": return "u"
+        if letter in "îï": return "i"
+        if letter in "ô": return "o"
+        if letter in "ç": return "c"
+    else : return False
 
 #Fonction qui reçoit les mots de chaque joueurs
 def input_joueur_mot(noms):
@@ -162,11 +173,18 @@ def input_joueur_mot(noms):
             else:
                 mot = input(f"{noms[i]}, veuillez entrer un mot de 3 lettres minimum:\n")
                 if mot =="" : return mot
-                elif mot in mots_matrice : 
-                    mot = mot.upper()+" (REPEAT)"
-                    return mot
-                mots_matrice.append(mot)
-    return mot.upper()
+                mot_sans_accent =""
+                for k in mot :
+                    remplacement = matching(k)
+                    if remplacement==False :
+                        mot_sans_accent+=k
+                    else : 
+                        mot_sans_accent+=remplacement
+                if mot_sans_accent in mots_matrice : 
+                    mot_sans_accent = mot_sans_accent.upper()+" (REPEAT)"
+                    return mot_sans_accent
+                mots_matrice.append(mot_sans_accent)
+    return mot_sans_accent.upper()
 
 #Fonction faisant la transpose de notre matrice de dés (source : Louis-Edouard Lafontant, IFT-1015)
 def transpose(matrice):
@@ -268,7 +286,7 @@ def jouer():
     #Affichage de la grille et des statistiques des joueurs
     affichage_statistiques(stats)
     affichage_grille(generateur)
-    #Déroulement du jeu : input des joueurs sur les mots (appel aussi la fonction qui regarde les tours des joueurs)
+    #Déroulement du jeu : input des joueurs sur les mots (appel aussi à la fonction qui regarde les tours des joueurs)
     while (nombre_tour_counter < nombre_tour_max):
         mot = input_joueur_mot(noms)
         if mot =="":
@@ -306,7 +324,7 @@ def gagnant(stats):
 
 def affichage_fin_jeu(stats):
     for i in range(nombre_joueurs):
-        print()
+        print("\n")
         print(stats[i][f"Joueur{i+1}"])
         print("---------------------------------------")
         for j in range(len(stats[i]["Mots"])):
@@ -316,7 +334,10 @@ def affichage_fin_jeu(stats):
             if pointage == 0 :
                 pointage = "x"
             statut = stats[i]['Statut'][j]
-            print(f"- {mot}{space}({pointage}) -- {statut}")
+            if statut == "ACCEPTE":
+                print(f"- {mot}{space}({pointage})")
+            else:
+                print(f"- {mot}{space}({pointage}) -- {statut}")
         print("=======================================")
         total = stats[i]["Total"]
         print(f"TOTAL: {total}")
@@ -357,12 +378,11 @@ jouer()
 affichage_fin_jeu(stats)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
 
-#les accents é è ê doivent être e voir demo wordle equiv letter
 #demande de jouer une autre partie
 #relire lenonce du devoir et aussi les reponse des questions studium
 #bonuses
 #faire les test unitaires (5 tests min pour generer grille, estvalide et calculpoint)
-#CHANGER LE NOMBRE DE TOUR A 10*NOMBRE DE JOUEUR
+#CHANGER LE NOMBRE DE TOUR A 10*NOMBRE DE JOUEURS
 
 #################################################################################
 # Tests
