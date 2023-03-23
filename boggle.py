@@ -66,13 +66,21 @@ grille_6x6 = {"3":1,"4":2,"5":3,"6":5,"7":7,"8":10,"9":12}
 
 # Déclaration des fonctions internes et calculs 
 
+#Fonction qui prend en input le nombre de manches
+def input_manches():
+    nombre_manches=""
+    while nombre_manches =="" or nombre_manches.isdigit()==False or int(nombre_manches)<1:
+        nombre_manches = input("Veuillez entrer le nombre de manches: ").strip()
+    return int(nombre_manches)
+
+#Fonction qui prend en input le nombre de joueurs qui jouent
 def input_joueurs():
     nombre_joueurs=""
     while nombre_joueurs =="" or nombre_joueurs.isdigit()==False or int(nombre_joueurs)<1:
-        nombre_joueurs = input("Veuillez entrer le nombre de joueur: ").strip()
+        nombre_joueurs = input("Veuillez entrer le nombre de joueurs: ").strip()
     return int(nombre_joueurs)
 
-#Fonction qui prend en input les noms des joueurs et la grandeur de la grille
+#Fonction qui prend en input les noms des joueurs
 def input_noms(nombre_joueurs):
     noms = [None]*nombre_joueurs
     for i in range(nombre_joueurs): 
@@ -124,7 +132,7 @@ def affichage_statistiques(statistiques):
 
 #Fonction qui affiche la grille selon la taille demandée et en utilisant la matrice de dés aléatoires
 def affichage_grille(generateur):
-    print("Voici la grille de jeu:")
+    print("\nVoici la grille de jeu:")
     for _ in range(generateur[0]*4):
         print("-",end="")
     print("-")
@@ -282,7 +290,8 @@ def calcul_total():
         stats[i]["Total"]=sum(stats[i]["Pointage"])
 
 #Fonction principale en charge du déroulement du jeu/programme
-def jouer():  
+def jouer():
+    global nombre_manches, gagnants_totaux 
     #Affichage de la grille et des statistiques des joueurs
     affichage_statistiques(stats)
     affichage_grille(generateur)
@@ -304,23 +313,51 @@ def jouer():
             stats_append(mot,"ACCEPTE",points)
             tour_jeu()
     #Calcul des totaux à la fin du jeu
-    calcul_total()
-    return
+    calcul_total()  
+    #Affichage des statistiques de fin de jeu
+    affichage_fin_jeu(stats)
+    #Traitement de fin de jeu
+    nombre_manches-=1
+    gagnants_totaux.append(gagnant(stats))
+    #Reinitialisation du jeu selon le nombre de manches
+    if nombre_manches==0:
+        affichage_gagnants_totaux(gagnants_totaux)
+        return
+    else:
+        #Demande si les joueurs veulent continuer de jouer
+        decision = continue_jouer()
+        if decision == True :
+            initialisation(noms,taille_grille)
+            jouer()
+        elif decision == False:
+            return
+
+def continue_jouer():
+    decision = ""
+    while (decision != "O" and decision!= "N"):
+        decision = input("Voulez-vous continuer de jouer? (O/N)").upper()
+        if decision == "O":
+            return True
+        elif decision == "N": 
+            return False
+
+def affichage_gagnants_totaux(gagnants):
+    print(f"Voici la liste des gagnants des manches :{gagnants}")
 
 def gagnant(stats):
     highest_total = 0
-    gagnants_matrice = []
+    gagnants_manche_matrice = []
     for i in range(nombre_joueurs):
         current_total = stats[i]['Total']
         if current_total>highest_total:
             highest_total = current_total
     if highest_total == 0 :
-        return gagnants_matrice
+        return gagnants_manche_matrice
     else:
         for j in range(nombre_joueurs):
             if stats[j]['Total'] == highest_total:
-                gagnants_matrice.append(stats[j][f"Joueur{j+1}"])
-    return gagnants_matrice
+                gagnants_manche_matrice.append(stats[j][f"Joueur{j+1}"])
+    return gagnants_manche_matrice
 
 def affichage_fin_jeu(stats):
     for i in range(nombre_joueurs):
@@ -353,32 +390,39 @@ def affichage_fin_jeu(stats):
         print("\nÉgalité!")
     else: 
         print(f"\n{gagnants[0]} a remporté la partie!")
-
+  
+def initialisation(noms,taille_grille):
+    global nombre_tour_counter, mots_matrice, joueurs_abandon_matrice,stats,generateur
+    nombre_tour_counter = 0
+    mots_matrice = []
+    joueurs_abandon_matrice = [None]*nombre_joueurs
+    stats = statistiques(noms)
+    generateur = generer_grille(taille_grille)
+    return
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
 
 # Déclaration du code principal et Affichage
 
 #Création des inputs nécessaires (noms et taille de la grille)
+nombre_manches = input_manches()
 nombre_joueurs = input_joueurs()
 noms = input_noms(nombre_joueurs)
 taille_grille = input_taille_grille()
 #Création du compteur de tours et du nombre de tours maximum se basant sur le nombre de joueurs
 nombre_tour_counter = 0
 nombre_tour_max = 2*nombre_joueurs
-#Initialisation de la matrice de mots déjà entrés et de la matrice d'abandon
+#Initialisation de la matrice de mots déjà entrés,de la matrice d'abandon et de la matrice des gagnants totaux
 mots_matrice = []
 joueurs_abandon_matrice = [None]*nombre_joueurs
+gagnants_totaux=[]
 #Création des statistiques des joueurs
 stats = statistiques(noms)
 #Création du générateur de dés aléatoires
 generateur = generer_grille(taille_grille)
 #Déroulement du jeu
 jouer()
-#Fin du jeu
-affichage_fin_jeu(stats)
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
 
-#demande de jouer une autre partie
 #relire lenonce du devoir et aussi les reponse des questions studium
 #bonuses
 #faire les test unitaires (5 tests min pour generer grille, estvalide et calculpoint)
