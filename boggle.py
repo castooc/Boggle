@@ -430,6 +430,9 @@ jouer()
 
 #################################################################################
 # Tests
-def test() :
-    return
+def test_grille() : #Test pour la génération (et affichage) de la grille
+    taille_grille = 5
+    generateur = generer_grille(taille_grille)
+    generer_grille(taille_grille)
+    affichage_grille(generateur)
 #################################################################################
