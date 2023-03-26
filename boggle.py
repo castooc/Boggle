@@ -203,7 +203,9 @@ def transpose(matrice):
             matrice_trans[i].append(matrice[j][i])
     return matrice_trans   
 
-#Fonction vérifiant si le mot se retrouve dans la grille
+#Fonction vérifiant si le mot se retrouve dans la grille (remplace la fonction est_valide initiale du devoir)
+#Changer les paramètres "grille" par "generateur", mais les fonctions de ces paramètres sont similaires
+
 def est_dans_grille(mot,generateur):
     for i in range(generateur[0]):
         matrix_to_string_row = "".join(generateur[2][i])
@@ -244,8 +246,7 @@ def affichage_est_legal(message):
     else:
         print('Le mot est illégal')
 
-#Fonction de vérification des mots par le joueur adverse (valide ou rejeté)
-#Changer les paramètres "grille" et "mot" par "noms" et "mot", car la fonction va prendre le input des joueurs pour voir si le mot est accepté ou rejeté
+#Fonction de vérification des mots par le joueur adverse (valide ou rejeté) (la fonction est_dans_grille sera la fonction est_valide du devoir)
 #Nous avons une autre fonction "est_legal" qui va regarder si le mot est legal ou illegal selon les règles du jeu
 def est_valide(noms, mot):
     decision = ""
@@ -275,8 +276,11 @@ def stats_append(mot,string,pointage):
 
 #Fonction de calcul des points selon la longueur des mots
 #Changer les paramètres "grille" pour seulement inclure le mot et référer à la bonne matrice de points selon la taille de la grille
-def calcul_point(mot):
+#Calculons le total dans une autre fonction, nous allons donc tester ces 2 fonctions dans la partie des tests unitaires
+def calcul_point(mot,taille_grille):
     longueur_mot = len(mot)
+    if longueur_mot <3 : 
+        return
     if taille_grille == 4 : 
         return grille_4x4[f"{longueur_mot}"]
     elif taille_grille == 5 : 
@@ -284,8 +288,8 @@ def calcul_point(mot):
     elif taille_grille == 6 : 
         return grille_6x6[f"{longueur_mot}"]
 
-#Fonction de calcul des points de chaque joueur
-def calcul_total():
+#Fonction de calcul des points totaux des statistiques de chaque joueur
+def calcul_total(nombre_joueurs):
     for i in range(nombre_joueurs):
         stats[i]["Total"]=sum(stats[i]["Pointage"])
 
@@ -309,30 +313,31 @@ def jouer():
             tour_jeu()
             continue
         else:
-            points = calcul_point(mot)
+            points = calcul_point(mot,taille_grille)
             stats_append(mot,"ACCEPTE",points)
             tour_jeu()
     #Calcul des totaux à la fin du jeu
-    calcul_total()  
+    calcul_total(nombre_joueurs)  
     #Affichage des statistiques de fin de jeu
     affichage_fin_jeu(stats)
     #Traitement de fin de jeu
     nombre_manches-=1
     gagnants_totaux.append(gagnant(stats))
-    #Reinitialisation du jeu selon le nombre de manches
+    #Réinitialisation du jeu selon le nombre de manches
     if nombre_manches==0:
         affichage_gagnants_totaux(gagnants_totaux)
         return
     else:
         #Demande si les joueurs veulent continuer de jouer
-        decision = continue_jouer()
+        decision = input_continue_jouer()
         if decision == True :
-            initialisation(noms,taille_grille)
+            réinitialisation(noms,taille_grille)
             jouer()
         elif decision == False:
             return
 
-def continue_jouer():
+#Demander aux joueurs s'ils veulent encore jouer
+def input_continue_jouer():
     decision = ""
     while (decision != "O" and decision!= "N"):
         decision = input("Voulez-vous continuer de jouer? (O/N)").upper()
@@ -390,8 +395,9 @@ def affichage_fin_jeu(stats):
         print("\nÉgalité!")
     else: 
         print(f"\n{gagnants[0]} a remporté la partie!")
-  
-def initialisation(noms,taille_grille):
+
+#Pour réinitialiser une partie lorsque la manche est finie
+def réinitialisation(noms,taille_grille):
     global nombre_tour_counter, mots_matrice, joueurs_abandon_matrice,stats,generateur
     nombre_tour_counter = 0
     mots_matrice = []
@@ -425,14 +431,109 @@ jouer()
 
 #relire lenonce du devoir et aussi les reponse des questions studium
 #bonuses
-#faire les test unitaires (5 tests min pour generer grille, estvalide et calculpoint)
+#mettre le total a la fin?
 #CHANGER LE NOMBRE DE TOUR A 10*NOMBRE DE JOUEURS
 
 #################################################################################
 # Tests
-def test_grille() : #Test pour la génération (et affichage) de la grille
-    taille_grille = 5
-    generateur = generer_grille(taille_grille)
-    generer_grille(taille_grille)
-    affichage_grille(generateur)
+
+def test():
+#Test pour la fonction generer_grille
+#Test 1 : Vérifier que les 2 grilles sont de mêmes dimensions
+    def test_generer_grille_1(generer_grille_1, generer_grille_2):
+        n = generer_grille_1[0] #Nous sommmes supposés avoir une grille de dimension "n" pour avoir la dimension "nxn"
+        m = generer_grille_2[0] #Nous sommmes supposés avoir une grille de dimension "m" pour avoir la dimension "mxm"
+        assert n == m , "Échec, les 2 grilles ne sont pas de mêmes dimensions"
+                
+    test_generer_grille_1(generer_grille(5),generer_grille(5)) #Test pour 2 matrices 5x5
+
+#Test 2 : Vérifier que le nombre de dés est de nxn pour la grille de 2 dimensions
+    def test_generer_grille_2(generer_grille):
+        n = generer_grille[0]
+        assert generer_grille[1] == n**2 , "Échec, le nombre de dés est erroné"
+    
+    test_generer_grille_2(generer_grille(6)) #Test pour une matrice 6x6, donc nous voulons 36 dés
+       
+#Test 3 : Vérifier que le tableau de 2 dimensions retourné est bien de dimension nxn (même longueur de matrice et sous-matrice "nxn")
+    def test_generer_grille_3(generer_grille):
+        n = generer_grille[0]
+        assert len(generer_grille[2]) == n , "Échec, la dimension est erronée" #S'assure de la dimension des colonnes de la matrice est bien "n"
+        for sous_matrice in generer_grille[2]:
+            assert len(sous_matrice) == n , "Échec, la dimension est erronée" #S'assure de la dimension des lignes de la matrice est bien "n"
+        return
+    
+    test_generer_grille_3(generer_grille(5)) #Test pour une matrice 5x5
+
+#Test 4 : Vérifier que 2 appels successifs ne retournent pas la même grille (probabilité très basse)
+    def test_generer_grille_4(generer_grille_1, generer_grille_2):
+        n = generer_grille_1[0]
+        count = 0
+        for i in range(n):
+            if generer_grille_1[2][i] == generer_grille_2[2][i] :
+                count +=1
+        assert count != n , "Échec, les 2 grilles sont identiques"
+                
+    test_generer_grille_4(generer_grille(5),generer_grille(5)) #Test pour 2 matrices 5x5
+
+#Test 5 : Vérifier que les valeurs de la matrice sont des lettres de type string
+    def test_generer_grille_5(generer_grille):
+        n = generer_grille[0]
+        for i in range(n):
+            for j in range(n):
+                assert isinstance(generer_grille[2][i][j],str), "Échec, il y a des valeurs de type non string dans la grille"
+
+    test_generer_grille_5(generer_grille(6)) #Test pour une matrice 6x6
+
+#Test pour la fonction est_dans_grille (qui équivaut la fonction "est_valide" du devoir)
+#Test 1, 2 : Vérifie que la fonction retrouve un mots dans une colonne et dans une ligne
+    def test_est_dans_grille_vrai(est_dans_grille):
+        assert est_dans_grille, "Échec, le mot est dans la grille mais la fonction renvoie un false" 
+#Pour une matrice 4x4
+    test_est_dans_grille_vrai(est_dans_grille("dire",[4,16,[["d","v","x","l"],["i","s","e","a"],["r","n","u","a"],["e","s","t","g"]]]))
+    test_est_dans_grille_vrai(est_dans_grille("est",[4,16,[["d","v","x","l"],["i","s","e","a"],["r","n","u","a"],["e","s","t","g"]]]))
+
+#Test 3, 4: Vérifie que la fonction renvoie un false pour un mot qui n'est pas dans la grille (en colonne et en ligne)
+    def test_est_dans_grille_faux(est_dans_grille):
+        assert est_dans_grille == False, "Échec, le mot n'est pas dans la grille mais la fonction le trouve"        
+#Pour une matrice 5x5
+    test_est_dans_grille_faux(est_dans_grille("lire",[4,16,[["d","v","x","l","p"],["i","s","e","a","e"],["r","n","u","a","j"],["e","s","t","g","r"],["m","f","e","a","k"]]]))
+    test_est_dans_grille_faux(est_dans_grille("esx",[4,16,[["d","v","x","l","p"],["i","s","e","a","e"],["r","n","u","a","j"],["e","s","t","g","r"],["m","f","e","a","k"]]]))
+
+#Test 5, 6: Vérifie que la fonction trouve une mot en lisant à l'envers (colonne et ligne)
+#Pour une matrice 4x4
+    test_est_dans_grille_vrai(est_dans_grille("erid",[4,16,[["d","v","x","l"],["i","s","e","a"],["r","n","u","a"],["e","s","t","g"]]]))
+    test_est_dans_grille_vrai(est_dans_grille("tse",[4,16,[["d","v","x","l"],["i","s","e","a"],["r","n","u","a"],["e","s","t","g"]]]))
+
+#Test pour la fonction calcul_point
+#Test 1 : Vérifier que le calcul des points sort un integer
+    def test_calcul_point_1(calcul_point):
+        assert isinstance(calcul_point,int) , "Échec, la fonction retourne un autre type que integer"
+        
+    test_calcul_point_1(calcul_point("habit",5))
+
+#Test 2 : Vérifier que la valeur des points n'est pas un négatif
+    def test_calcul_point_2(calcul_point):
+        assert calcul_point>0, "Échec, mauvais calcul des points"
+
+    test_calcul_point_2(calcul_point("oie",5))
+
+#Test 3 : Vérifier que la valeur des points ne dépasse pas 12 points (selon la matrice de points donnée par l'énoncé du devoir)
+    def test_calcul_point_3(calcul_point):
+        assert calcul_point <=12, "Échec, mauvais calcul des points"
+
+    test_calcul_point_3(calcul_point("oiseau",6))
+
+#Test 4 : Vérifier que si on donne une taille de grille autre que 4, 5 ou 6, la fonction ne calculera pas de point
+    def test_calcul_point_4(calcul_point):
+        assert calcul_point == None, "Échec, la fonction calcule des points pour une grille de taille autre que 4, 5, 6"
+
+    test_calcul_point_4(calcul_point("oiseaux",7))
+
+#Test 5 : Vérifier que si on donne un mot de moins de 3 lettres, la fonction ne calculera pas de point
+    def test_calcul_point_5(calcul_point):
+        assert calcul_point == None, "Échec, la fonction calcule des points pour un mot de moins de 3 lettres"
+
+    test_calcul_point_5(calcul_point("le",6))
+
+test()
 #################################################################################
