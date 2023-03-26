@@ -1,6 +1,6 @@
 ###############################################################################
 ## Jeu Boggle
-## Voici une simulation python simplifiée du jeu "Boggle" pour 2 joueurs.
+## Voici une simulation python simplifiée du jeu "Boggle".
 ## Le jeu consiste à trouver des mots jusqu`à un maximum de 10 mots
 ## Le pointage est calculé selon la taille de ces mots.
 ## Un mot est valide s'il est composé de minimum 3 lettres adjacentes sur une même ligne ou colonne.
@@ -205,14 +205,16 @@ def transpose(matrice):
 
 #Fonction vérifiant si le mot se retrouve dans la grille (remplace la fonction est_valide initiale du devoir)
 #Changer les paramètres "grille" par "generateur", mais les fonctions de ces paramètres sont similaires
-
 def est_dans_grille(mot,generateur):
     for i in range(generateur[0]):
+        #Joindre la matrice pour les lignes et les lignes en reverse
         matrix_to_string_row = "".join(generateur[2][i])
         matrix_to_string_row_reverse = matrix_to_string_row[::-1]
+        #Joindre la matrice pour les colonnes et les colonnes en reverse
         matrix_trans = transpose(generateur[2])
         matrix_to_string_col = "".join(matrix_trans[i])
         matrix_to_string_col_reverse = matrix_to_string_col[::-1]
+        #Chercher le mot dans les lignes et colonnes
         find_word_row = matrix_to_string_row.find(mot)
         find_word_row_reverse = matrix_to_string_row_reverse.find(mot)
         find_word_col = matrix_to_string_col.find(mot)
@@ -416,7 +418,7 @@ noms = input_noms(nombre_joueurs)
 taille_grille = input_taille_grille()
 #Création du compteur de tours et du nombre de tours maximum se basant sur le nombre de joueurs
 nombre_tour_counter = 0
-nombre_tour_max = 2*nombre_joueurs
+nombre_tour_max = 10*nombre_joueurs
 #Initialisation de la matrice de mots déjà entrés,de la matrice d'abandon et de la matrice des gagnants totaux
 mots_matrice = []
 joueurs_abandon_matrice = [None]*nombre_joueurs
@@ -428,12 +430,6 @@ generateur = generer_grille(taille_grille)
 #Déroulement du jeu
 jouer()
 #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -# 
-
-#relire lenonce du devoir et aussi les reponse des questions studium
-#bonuses
-#mettre le total a la fin?
-#CHANGER LE NOMBRE DE TOUR A 10*NOMBRE DE JOUEURS
-
 #################################################################################
 # Tests
 
